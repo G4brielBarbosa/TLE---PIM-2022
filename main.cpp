@@ -2,17 +2,31 @@
 
 #include <iostream>
 #include <stdio.h>
+#include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
+#include <sstream>
 #include <locale.h>
 #include <conio.h>
 #include <cstdlib>
+#include <time.h>
 #define tamanho 100
 
 using namespace std;
 
 
 // Classes
+
+typedef struct tim {
+int tm_sec; //representa os segundos de 0 a 59
+int tm_min; //representa os minutos de 0 a 59
+int tm_hour; //representa as horas de 0 a 24
+int tm_mday; //dia do mês de 1 a 31
+int tm_year; //representa o ano a partir de 1900
+int tm_wday; //dia da semana de 0 (domingo) até 6 (sábado)
+int tm_yday; // dia do ano de 1 a 365
+int tm_isdst; //indica horário de verão se for diferente de zero
+};
 
 typedef struct Login{
 	char user[50];
@@ -26,21 +40,21 @@ typedef struct Funcionario{
 } funcionarioTipo;
 
 typedef struct Cliente{
-	char idCliente[50];
+	char idCliente;
 	char nomeCliente[50];
 } clienteTipo;
 
 typedef struct Vendas{
-	char codVendas[50];
-	char codProduto[50];
-	char codCliente[50];
+	char codVendas;
+	char codProduto;
+	char codCliente;
 	char quantidadeVenda[50];
 	char totalVenda[50];
 	char dataVenda[50];	
 } vendaTipo;
 
 typedef struct Produto{
-	char codProduto[50];
+	char codProduto;
 	char nomeProduto[50];
 	char valorProduto[50];
 	char qntEstoque[50];
@@ -56,7 +70,7 @@ FILE *arquivoProduto;
 
 // Protótipos
 
-void Cadastrar	(void);
+void Cadastrar(void);
 void Pesquisar(void);
 void menu(void);
 void cadastrarCliente(void);
@@ -64,6 +78,9 @@ void menuOpcoes(void);
 void cadastrarFuncionario(void);
 void cadastrarVenda(void);
 void cadastrarProduto(void);
+void menuRelatorio(void);
+void abaterEstoque(void);
+
 
 // Variaveis Globais
 
@@ -74,22 +91,140 @@ funcionarioTipo funcionario[tamanho];
 vendaTipo venda[tamanho];
 produtoTipo produto[tamanho];
 
-
 // Funções
-void cadastrarProduto(void){
-	int i = 0;
-	int back;
-	int lerProduto;
+void Data(void){
+	double horario;
+	double dia;
+	double mes;
+	double ano;
+	struct tm *data_hora_atual;  
 	
-	arquivoProduto = fopen("produto.txt", "a+");
+  	  //variável do tipo time_t para armazenar o tempo em segundos  
+	time_t segundos;
+	  
+    //obtendo o tempo em segundos  
+	time(&segundos);   
+	  
+	  //para converter de segundos para o tempo local  
+	  //utilizamos a função localtime  
+
+	data_hora_atual = localtime(&segundos);  
+	dia = data_hora_atual->tm_mday;
+	mes = data_hora_atual->tm_mon+1;
+	ano =   data_hora_atual->tm_year+1900;
+	cout << dia  << "/" << mes << "/" << ano;
+  	
+}
+
+int autoIncrement(int escolha){
+	int i = 0, returnIncrement = 1, increment;
+	
+	switch(escolha){
+		
+		case 1:
+			arquivoProduto = fopen("produto.txt", "r");
+	
+			returnIncrement = fread(&produto[i], sizeof(produtoTipo), 1, arquivoProduto);
+			while(returnIncrement == 1) {
+		
+			i++;
+			returnIncrement = fread(&produto[i], sizeof(produtoTipo), 1, arquivoProduto);
+		}
+		break;
+		
+		case 2:
+			arquivoCliente = fopen("cliente.txt", "r");
+	
+			returnIncrement = fread(&cliente[i], sizeof(clienteTipo), 1, arquivoCliente);
+			while(returnIncrement == 1) {
+		
+			i++;
+			returnIncrement = fread(&cliente[i], sizeof(clienteTipo), 1, arquivoCliente);
+		}	
+		break;
+		
+		case 3:
+			arquivoCliente = fopen("vendas.txt", "r");
+	
+			returnIncrement = fread(&venda[i], sizeof(vendaTipo), 1, arquivoVenda);
+			while(returnIncrement == 1) {
+		
+			i++;
+			returnIncrement = fread(&venda[i], sizeof(vendaTipo), 1, arquivoVenda);
+		}
+	}
+	increment = i + 1;
+	
+	
+	
+	return increment;
+}
+
+
+void abaterEstoque(char codigo, char quantidade[50]){
+	int retorno = 1;
+	int i = 0;
+	
+	arquivoProduto = fopen("produto.txt", "r+");
 	
 	if(arquivoProduto == NULL){
 		cout << "Não foi possivel abrir o arquivo";
 		exit(0);
 	}
 	
-	cout << "Digite o código do produto" << endl;
-	gets(produto[i].codProduto);
+	retorno = fread(&produto[i], sizeof(produtoTipo), 1, arquivoProduto);
+	
+	while(retorno == 1){
+		if(codigo == produto[i].codProduto){
+			int controle = atoi(produto[i].qntEstoque);
+			int controle2 = atoi(quantidade);
+			int result = controle - controle2;
+			snprintf(produto[i].qntEstoque, 50, "%d", result);				
+			
+		}
+		i++;
+		retorno = fread(&produto[i], sizeof(produtoTipo), 1, arquivoProduto);
+	}
+	
+	fclose(arquivoProduto);
+	remove("produto.txt");
+	arquivoProduto = fopen("produto.txt", "a+");
+	if(arquivoProduto == NULL){
+		cout << "Não foi possivel abrir o arquivo";
+		exit(0);
+	}
+	retorno = fwrite(&produto, sizeof(produtoTipo), 1, arquivoProduto);
+	
+	for(int k = 1; k < 100 ; k++){
+		retorno = fwrite(&produto[k], sizeof(produtoTipo), 1, arquivoProduto);
+		if(retorno != 1){
+			cout << "Erro!!";
+		}
+	}
+	fclose(arquivoProduto);	
+}
+
+void cadastrarProduto(void){
+	int i = 0;
+	int back;
+	int lerProduto;
+
+	char stringIncrement = autoIncrement(1) + '0';
+
+	char* nome1("produto.txt");
+	
+	arquivoProduto = fopen(nome1, "a+");
+	
+	if(arquivoProduto == NULL){
+		cout << "Não foi possivel abrir o arquivo";
+		exit(0);
+	}
+	
+	for(int h = 0; h < 1; h++){
+		
+		produto[h].codProduto = stringIncrement;
+		
+	}
 	
 	cout << "Digite o nome do produto" << endl;
 	gets(produto[i].nomeProduto);
@@ -100,11 +235,16 @@ void cadastrarProduto(void){
 	cout << "Digite a quantidade do produto" << endl;
 	gets(produto[i].qntEstoque);
 	
-	lerProduto = fwrite(&produto[i], sizeof(produtoTipo), 1, arquivoProduto);
+	
+
+	lerProduto = fwrite(produto, sizeof(produtoTipo), 1, arquivoProduto);
+	
+	
 	
 	if(lerProduto == 1){
 		cout << "Cadastro efetuado com sucesso" << endl;
 	}
+
 	
 	fclose(arquivoProduto);
 	cout << "Para voltar ao menu anterior pressione ESC" << endl;
@@ -120,6 +260,8 @@ void cadastrarVenda(void){
 	int i = 0;
 	int back;
 	int lerVenda;
+	char teste;
+	char stringIncrement = autoIncrement(3) + '0';
 	
 	arquivoVenda = fopen("vendas.txt", "a+");
 	
@@ -128,23 +270,31 @@ void cadastrarVenda(void){
 		exit(0);
 	}
 	
+	for(int h = 0; h < 1; h++){
+		
+		venda[h].codVendas = stringIncrement;
+		
+	}
+	
 	cout << "Digite a data da venda" << endl;
 	gets(venda[i].dataVenda);
-	
-	cout << "Digite o código da venda" <<  endl;
-	gets(venda[i].codVendas);
-	
+		
 	cout << "Digite o código do cliente" << endl;
-	gets(venda[i].codCliente);
-	
+	cin >> venda[i].codCliente;
+	getchar();
 	cout << "Digite o código do produto" << endl;
-	gets(venda[i].codProduto);
-	
-	cout << "Digite a quantidade de produtos vendidos" << endl;
-	gets(venda[i].quantidadeVenda);
+	cin >> venda[i].codProduto;
+	teste = venda[i].codProduto;
+	getchar();
 	
 	cout << "Digite o valor total da venda" << endl;
 	gets(venda[i].totalVenda);
+	
+	cout << "Digite a quantidade de produtos vendidos" << endl;
+	gets(venda[i].quantidadeVenda);
+		
+	
+	abaterEstoque(teste, venda[i].quantidadeVenda);
 	
 	lerVenda = fwrite(&venda[i], sizeof(vendaTipo), 1, arquivoVenda);
 	
@@ -208,8 +358,15 @@ void cadastrarCliente(void){
 		cout << "Não foi possivel abrir o arquivo";
 		exit(0);
 	}
-	cout << "Digite o código do cliente" << endl;
-	gets(cliente[i].idCliente);
+	
+	char stringIncrement = autoIncrement(1) + '0';
+	
+	for(int h = 0; h < 1; h++){
+		
+		cliente[h].idCliente = stringIncrement;
+		
+	}
+
 	cout << "Digite o nome do cliente" << endl;
 	gets(cliente[i].nomeCliente);
 	
@@ -291,15 +448,47 @@ void menuOpcoes(void){
 			cadastrarVenda();
 			break;
 		case '5':
-			cout << "Relatorios";
+			system("cls");
+			menuRelatorio();
 			break;
-		case '6':
-			cout << "Vendas";
 		default:
 			cout << "Opção invalida";
 			break;
 	}
 	
+}
+
+void menuRelatorio(void){
+	int opcao;
+	system("cls");
+	cout << "***********************RELATORIOS***********************" << endl;
+	cout << "*                                                      *" << endl;
+	cout << "***********SELECIONE QUAL OPÇÃO QUER ACESSAR************" << endl;
+	cout << "*                                                      *" << endl;
+	cout << "*                   1 - VENDAS P/ CLIENTE              *" << endl;
+	cout << "*                   2 - VENDAS P/ PRODUTO              *" << endl;
+	cout << "*                   3 - TOTAL DE VENDAS                *" << endl;	
+	cout << "*                   4 - ESTOQUE                        *" << endl;	
+	cout << "*                                                      *" << endl;
+	cout << "********************************************************" << endl;
+	opcao = getch();
+	switch(opcao){
+		case 1:
+			cout << "VENDAS P/ CLIENTE";
+			break;
+		case 2:
+			cout << "VENDAS P/ PRODUTO";
+			break;
+		case 3:
+			cout << "TOTAL DE VENDAS";
+			break;
+		case 4:
+			cout << "ESTOQUE";
+			break;
+		default:
+			cout << "OPCAO INVALIDA";
+			break;
+	}
 }
 
 void Pesquisar(void){
@@ -319,6 +508,8 @@ void Pesquisar(void){
 	gets(senhas);
 	retorno = fread(&maximo[i], sizeof(logon), 1, arquivo);
 	while(retorno == 1) {
+		
+		
 		if(strcmp(login, maximo[i].user) == 0 && strcmp(senhas, maximo[i].senha) == 0){
 			menuOpcoes();
 			cont++;
@@ -377,9 +568,10 @@ void menu(void){
 int main() {
 	int var;
 	system("title Login");
-	system("color 5F");
+	system("color 9F");
 	setlocale(LC_ALL, "Portuguese");
 	menu();
 	
+
 	return 0;
 }

@@ -693,7 +693,6 @@ void menuOpcoes(void){ // função responsavel por abrir o menu após o login
 	cout << "                                     *                   3 - CADASTRAR FUNCIONARIO          *" << endl;	
 	cout << "                                     *                   4 - CADASTRAR VENDA                *" << endl;	
 	cout << "                                     *                   5 - GERAR RELATORIO                *" << endl;
-	cout << "                                     *                   6 - VENDAS                         *" << endl;
 	cout << "                                     *                                                      *" << endl;
 	cout << "                                     ********************************************************" << endl;
 	cout << endl;

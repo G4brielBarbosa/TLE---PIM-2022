@@ -24,9 +24,9 @@ typedef struct Login{
 } logon;
 
 typedef struct Funcionario{
-	char nome[50];
-	char cargo[50];
-	char salario[50];
+	char nome[20];
+	char cargo[20];
+	char salario[20];
 } funcionarioTipo;
 
 typedef struct Cliente{
@@ -78,7 +78,9 @@ void buscarVendasCliente(void);
 void buscarVendasProduto(void);
 void listarVendas(void);
 void manualUsuario(void);
-
+void listarEstoqueProduto(void);
+void listarEstoque(void);
+void listarFuncionarios(void);
 
 // Variaveis Globais e instancias das Structs
 
@@ -437,6 +439,143 @@ void buscarVendasCliente(){ // função responsavel por filtrar por cliente solici
 	}
 }
 
+void listarEstoque(void){
+	int retornoEstoque, i = 0; // variavéis inteiras para controle
+	produtoTipo produtoLista[tamanho]; // instância da struct vendaTipo para receber as informações do arquivo vendas.txt
+	char t; // variavél para receber o valor para voltar ao menu anterior
+	
+	
+	arquivoProduto = fopen("produto.txt", "a+"); // atribuição para abrir o arquivo produto.txt
+	
+	if(arquivoProduto == NULL){ // se der algum erro e retornar NULL , informar na tela que não foi possivel abrir/criar o arquivo.
+		cout << "Não foi possivel abrir o arquivo";
+		exit(0);
+	}
+	
+	retornoEstoque = fread(&produtoLista[i], sizeof(produtoTipo), 1, arquivoProduto); // função que le o arquivo e retornar 1 caso encontrou algo no arquivo.
+	
+	while(retornoEstoque == 1){ // laço de repetição para adicionar a struct produto todas as informações que tiver em posições i diferentes
+		
+		i++;
+		retornoEstoque = fread(&produtoLista[i], sizeof(produtoTipo), 1, arquivoProduto);
+	}
+	
+	fclose(arquivoProduto); // função para fechar o arquivo
+	system("cls");
+	cout << "***********************************************ESTOQUE*******************************************" << endl;
+	cout << "                                                                                                " << endl;
+	cout << "                             nºProduto                       Quantidade                         " << endl;
+	cout << "                                                                                                " << endl;
+	for(int j = 0; j < i; j++){ // laço de repetição responsavel por adicionar os valores do arquivo txt a instancia da struct vendaTipo na memória.
+		char idProduto = produtoLista[j].codProduto;
+		int qntEstoque = atoi(produtoLista[j].qntEstoque);
+		cout << "                             " << idProduto <<"                                   " << qntEstoque << "                         " << endl; // imprimir na tela 
+	
+	}
+	cout << "************************************************************************************************" << endl;
+	
+	cout << endl << endl << endl ;
+	cout << "Para voltar ao menu anterior pressione ESC" << endl;
+	t = getch();
+	if(t == 27){ // 27 = ESC , para voltar ao menu anterior
+		menuRelatorio();
+		
+	}
+
+	
+}
+
+void listarFuncionarios(void){
+	int retornoFuncionario, i = 0; // variavéis inteiras para controle
+	funcionarioTipo funcionarioLista[tamanho]; // instância da struct vendaTipo para receber as informações do arquivo vendas.txt
+	char t; // variavél para receber o valor para voltar ao menu anterior
+	
+	
+	arquivoFuncionario = fopen("funcionario.txt", "a+"); // atribuição para abrir o arquivo produto.txt
+	
+	if(arquivoFuncionario == NULL){ // se der algum erro e retornar NULL , informar na tela que não foi possivel abrir/criar o arquivo.
+		cout << "Não foi possivel abrir o arquivo";
+		exit(0);
+	}
+	
+	retornoFuncionario = fread(&funcionarioLista[i], sizeof(funcionarioTipo), 1, arquivoFuncionario); // função que le o arquivo e retornar 1 caso encontrou algo no arquivo.
+	
+	while(retornoFuncionario == 1){ // laço de repetição para adicionar a struct produto todas as informações que tiver em posições i diferentes
+		
+		i++;
+		retornoFuncionario = fread(&funcionarioLista[i], sizeof(funcionarioTipo), 1, arquivoFuncionario);
+	}
+	
+	fclose(arquivoFuncionario); // função para fechar o arquivo
+	system("cls");
+	cout << "***********************************************ESTOQUE*******************************************" << endl;
+	cout << "                                                                                                " << endl;
+	cout << "                     NOME                       CARGO                       SALARIO             " << endl;
+	cout << "                                                                                                " << endl;
+	for(int j = 0; j < i; j++){ // laço de repetição responsavel por adicionar os valores do arquivo txt a instancia da struct vendaTipo na memória.
+		printf("                     ""%s", funcionarioLista[j].nome);
+		printf("                     ""%s", funcionarioLista[j].cargo);
+		printf("                     ""%s \n", funcionarioLista[j].salario);
+	}
+	cout << "*************************************************************************************************" << endl;
+	
+	cout << endl << endl << endl ;
+	cout << "Para voltar ao menu anterior pressione ESC" << endl;
+	t = getch();
+	if(t == 27){ // 27 = ESC , para voltar ao menu anterior
+		menuRelatorio();
+		
+	}
+
+}
+
+void listarEstoqueProduto(void){
+	
+	char codigoBuscar;
+	int retornoEstoqueProduto, i = 0;
+	produtoTipo produtoListaEstoque[tamanho];
+	char t;
+	
+	arquivoProduto = fopen("produto.txt", "a+");
+	
+	if(arquivoProduto == NULL){ // se der algum erro e retornar NULL , informar na tela que não foi possivel abrir/criar o arquivo
+		cout << "Não foi possivel abrir o arquivo";
+		exit(0);
+	}
+	
+	retornoEstoqueProduto = fread(&produtoListaEstoque[i], sizeof(produtoTipo), 1, arquivoProduto); // função que le o arquivo e retornar 1 caso encontrou algo no arquivo.
+	
+	cout << "Digite o código do produto" << endl;
+	cin >> codigoBuscar; // salva na variável o valor do código do produto
+	
+	system("cls");
+	cout << "***********************************************ESTOQUE*******************************************" << endl;
+	cout << "                                                                                                " << endl;
+	cout << "                             nºProduto                       Quantidade                         " << endl;
+	cout << "                                                                                                " << endl;
+	
+	while(retornoEstoqueProduto == 1){ // laço de repetição responsavel por passar por todos valores do arquivo e verificar qual o código digitado pelo cliente bate e depois adicionar todos seus atribuitos as variáveis
+			if(codigoBuscar == produtoListaEstoque[i].codProduto){
+					char idProduto = produtoListaEstoque[i].codProduto;
+					int qtdEstoque = atoi(produtoListaEstoque[i].qntEstoque);
+					cout << "                             " << idProduto <<"                                   " << qtdEstoque << "                         " << endl;
+			}
+		i++;
+		retornoEstoqueProduto = fread(&produtoListaEstoque[i], sizeof(produtoTipo), 1, arquivoProduto);
+	}	
+	fclose(arquivoProduto); // fecha o arquivo vendas.txt
+	cout << "************************************************************************************************" << endl;
+	cout << endl << endl << endl ;
+	cout << "Para voltar ao menu anterior pressione ESC" << endl;
+	cout << "Tentar novamente digite qualquer tecla" << endl;
+	t = getch(); 
+	if(t == 27){ // condição para voltar ao menu atenrior caso o usuario aperte ESC
+		menuRelatorio();
+		
+	}
+	
+}
+
 void cadastrarProduto(void){ // função responsavel para cadastrar produtos
 	int i = 0, back, lerProduto; // variáveis de controle
 	char acessoCod;
@@ -513,6 +652,11 @@ void cadastrarProduto(void){ // função responsavel para cadastrar produtos
 			cout << "Digite a quantidade de produtos" << endl; 
 			gets(quantidadeAdicionar[i].qntEstoque); // recebe a quantidade produtos
 			adicionarEstoque(acessoCod, quantidadeAdicionar[i].qntEstoque); // executa a função adicionarEstoque e passa como parametro o código e a quantidade digitadas pelo usuario
+			cout << "Para voltar ao menu anterior pressione ESC" << endl;
+			back = getch();
+				if (back == 27){ // verificar para caso o usuario digitou esc para voltar ao menu atenrior
+				menuOpcoes();
+			}
 		break;	
 		
 		case 27: // caso o usuario queira voltar ao menu anterior
@@ -586,6 +730,8 @@ void cadastrarFuncionario(void){ // função responsavel por cadastrar funcionario
 		cout << "Não foi possivel abrir o arquivo"; 
 		exit(0);
 	}
+	
+	
 	cout << "Digite o nome do funcionario" << endl;
 	gets(funcionario[i].nome); // adiciona a struct o valor digitado pelo usuario
 	cout << "Digite o cargo do funcionario" << endl;
@@ -595,7 +741,7 @@ void cadastrarFuncionario(void){ // função responsavel por cadastrar funcionario
 
 
 	
-	lerFuncionario = fwrite(&funcionario[i], sizeof(clienteTipo), 1, arquivoFuncionario); // função responsavel por escrever no arquivo a struct com os valores digitados pelo usuario
+	lerFuncionario = fwrite(funcionario, sizeof(clienteTipo), 1, arquivoFuncionario); // função responsavel por escrever no arquivo a struct com os valores digitados pelo usuario
 	
 	if(lerFuncionario == 1){ // verificação se foi retornado o valor 1 a variável ler produto, se sim o arquivo foi editado
 		cout << "Cadastro efetuado com sucesso" << endl;
@@ -740,6 +886,9 @@ void menuRelatorio(void){ // função responsavel por abrir o menu de relátorios
 	cout << "                                     *                   1 - VENDAS P/ CLIENTE              *" << endl;
 	cout << "                                     *                   2 - VENDAS P/ PRODUTO              *" << endl;
 	cout << "                                     *                   3 - TOTAL DE VENDAS                *" << endl;		
+	cout << "                                     *                   4 - ESTOQUE P/ PRODUTO             *" << endl;
+	cout << "                                     *                   5 - TOTAL ESTOQUE                  *" << endl;
+	cout << "                                     *                   6 - LISTA FUNCIONARIOS             *" << endl;
 	cout << "                                     *                                                      *" << endl;
 	cout << "                                     ********************************************************" << endl;
 	cout << "                                             PARA VOLTAR AO MENU ANTERIOR - APERTE ESC       " << endl;
@@ -753,6 +902,15 @@ void menuRelatorio(void){ // função responsavel por abrir o menu de relátorios
 			break;
 		case '3': // caso selecionar executa a função listarVendas
 			listarVendas();
+			break;
+		case '4': // caso selecionar executa a função listarVendas
+			listarEstoqueProduto();
+			break;
+		case '5': // caso selecionar executa a função listarVendas
+			listarEstoque();
+			break;
+		case '6': // caso selecionar executa a função listarVendas
+			listarFuncionarios();
 			break;
 		case 27: // caso selecionado voltar ao menu anterior executando a função menuOpcoes()
 			menuOpcoes();

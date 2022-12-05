@@ -360,15 +360,14 @@ void buscarVendasProduto(){ // função responsavel por filtar pelo produto solici
 	
 	while(retornoVendaProduto == 1){ // laço de repetição responsavel por passar por todos valores do arquivo e verificar qual o código digitado pelo cliente bate e depois adicionar todos seus atribuitos as variáveis
 			if(codigoBuscar == vendaListaProduto[i].codProduto){
-				for(int j = 0; j < i; j++){ // laço de repetição que atribui os valores as variavéis e imprimi cada um na tela
-					char idVenda = vendaListaProduto[j].codVendas;
-					char idCliente = vendaListaProduto[j].codCliente;
-					char idProduto = vendaListaProduto[j].codProduto;
-					int qtdVendida = atoi(vendaListaProduto[j].quantidadeVenda);
-					int totalVendido = atoi(vendaListaProduto[j].totalVenda);
+					char idVenda = vendaListaProduto[i].codVendas;
+					char idCliente = vendaListaProduto[i].codCliente;
+					char idProduto = vendaListaProduto[i].codProduto;
+					int qtdVendida = atoi(vendaListaProduto[i].quantidadeVenda);
+					int totalVendido = atoi(vendaListaProduto[i].totalVenda);
 					cout << "* " << idVenda <<"                " << idCliente << "                 " << idProduto << "                 " << qtdVendida << "                    " << totalVendido << "              *" << endl;
 	
-				}
+				
 			}
 		i++;
 		retornoVendaProduto = fread(&vendaListaProduto[i], sizeof(vendaTipo), 1, arquivoVenda);
@@ -414,22 +413,20 @@ void buscarVendasCliente(){ // função responsavel por filtrar por cliente solici
 	
 	while(retornoVendaCliente == 1){ // laço de repetição responsavel por passar por todos valores do arquivo e verificar qual o código digitado pelo cliente bate e depois adicionar todos seus atribuitos as variáveis
 			if(codigoBuscar == vendaListaCliente[i].codCliente){
-				for(int j = 0; j < i; j++){ // laço de repetição que atribui os valores as variavéis e imprimi cada um na tela
-					char idVenda = vendaListaCliente[j].codVendas;
-					char idCliente = vendaListaCliente[j].codCliente;
-					char idProduto = vendaListaCliente[j].codProduto;
-					int qtdVendida = atoi(vendaListaCliente[j].quantidadeVenda);
-					int totalVendido = atoi(vendaListaCliente[j].totalVenda);
+					char idVenda = vendaListaCliente[i].codVendas;
+					char idCliente = vendaListaCliente[i].codCliente;
+					char idProduto = vendaListaCliente[i].codProduto;
+					int qtdVendida = atoi(vendaListaCliente[i].quantidadeVenda);
+					int totalVendido = atoi(vendaListaCliente[i].totalVenda);
 					cout << "        " << idVenda <<"                " << idCliente << "                 " << idProduto << "                 " << qtdVendida << "                    " << totalVendido << "              " << endl;
 	
-				}
+				
 			}
 		i++;
 		retornoVendaCliente = fread(&vendaListaCliente[i], sizeof(vendaTipo), 1, arquivoVenda);
 	}	
 	fclose(arquivoVenda); // fecha o arquivo vendas.txt
 	cout << "************************************************************************************************" << endl;
-	
 	cout << endl << endl << endl ;
 	cout << "Para voltar ao menu anterior pressione ESC" << endl;
 	cout << "Tentar novamente digite qualquer tecla" << endl;
